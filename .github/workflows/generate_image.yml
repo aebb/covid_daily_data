@@ -1,0 +1,33 @@
+# This is a basic workflow to help you get started with Actions
+
+name:  Generate Image
+
+# Controls when the action will run. Triggers the workflow on push or pull request
+# events but only for the main branch
+on:
+  push:
+  schedule:
+    - cron: '00 21 * * *'
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: r-lib/actions/setup-r@v1
+    - name: Install Package Dependencies
+      run: |-
+        Rscript -e "install.packages('remotes')"
+        Rscript -e "remotes::install_github('rstudio/webshot2')"
+        Rscript -e "install.packages('ggplot2')"  
+    - name: Generate Image
+      run: |-
+        Rscript -e "source('script.r')"
+    - name: Commit and push if changed
+      run: |-
+        git add image.png
+        git config --global user.email "github-action-bot@example.com"
+        git config --global user.name "GitHub Action Bot"
+        git commit --file commit_message.txt || echo "No changes"
+        git push
