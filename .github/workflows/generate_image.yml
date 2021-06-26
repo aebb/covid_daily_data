@@ -6,6 +6,8 @@ name:  Generate Image
 # events but only for the main branch
 on:
   push:
+    branches:
+      - master
   schedule:
     - cron: '00 21 * * *'
 
@@ -19,15 +21,24 @@ jobs:
     - name: Install Package Dependencies
       run: |-
         Rscript -e "install.packages('remotes')"
-        Rscript -e "remotes::install_github('rstudio/webshot2')"
+      #Rscript -e "remotes::install_github('rstudio/webshot2')"
         Rscript -e "install.packages('ggplot2')"  
+        Rscript -e "install.packages('ggthemes')"
+        Rscript -e "install.packages('rnaturalearth')" 
+        Rscript -e "install.packages('rgeos')" 
+        Rscript -e "install.packages('rnaturalearthhires', repos = 'http://packages.ropensci.org', type = 'source')"
     - name: Generate Image
       run: |-
         Rscript -e "source('script.r')"
     - name: Commit and push if changed
       run: |-
         git add image.png
+        git add image2.png
         git config --global user.email "github-action-bot@example.com"
         git config --global user.name "GitHub Action Bot"
         git commit --file commit_message.txt || echo "No changes"
         git push
+    - name: Webhook notification
+        curl --location --request POST ${{ secrets.WEBHOOK_URL }} \
+        --header 'Content-Type: application/json' \
+        --data-raw '{"content": "https://raw.githubusercontent.com/aebb/covid_daily_data/master/image2.png"}'
