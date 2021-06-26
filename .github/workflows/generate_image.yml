@@ -6,23 +6,25 @@ name:  Generate Image
 # events but only for the main branch
 on:
   push:
+    branches:
+      - master
   schedule:
     - cron: '00 21 * * *'
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
+#Rscript -e "remotes::install_github('rstudio/webshot2')"
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
     - uses: r-lib/actions/setup-r@v1
-    - name: Install Package Dependencies
+    - name: Install Package Dependencies & run
       run: |-
         Rscript -e "install.packages('remotes')"
         Rscript -e "remotes::install_github('rstudio/webshot2')"
         Rscript -e "install.packages('ggplot2')"  
-    - name: Generate Image
-      run: |-
+        Rscript -e "install.packages('ggthemes')"
         Rscript -e "source('script.r')"
     - name: Commit and push if changed
       run: |-
@@ -31,3 +33,10 @@ jobs:
         git config --global user.name "GitHub Action Bot"
         git commit --file commit_message.txt || echo "No changes"
         git push
+    - name: Webhook notification
+      uses: indiesdev/curl@v1
+      with:
+        url: ${{ secrets.WEBHOOK_URL }}
+        method: 'POST'
+        headers: '{ "Content-Typer": "application/json" }'
+        body: '{"content": "https://raw.githubusercontent.com/aebb/covid_daily_data/master/image.png"}'
