@@ -32,3 +32,8 @@ jobs:
         git config --global user.name "GitHub Action Bot"
         git commit --file commit_message.txt || echo "No changes"
         git push
+    - name: Notification
+      run: |-
+        curl --location --request POST ${{ secrets.WEBHOOK_URL }} \
+        --header 'Content-Type: application/json' \
+        --data-raw '{"content": "https://raw.githubusercontent.com/aebb/covid_daily_data/master/image.png"}'
