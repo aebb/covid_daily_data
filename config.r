@@ -6,4 +6,6 @@ image_file2 <- 'image2.png'
 line_color <- '#198ce7'
 point_color <- '#198ce7'
 text_color <- '#a0a0a3'
+prediction_interval <- 15
 commit_message_file <- 'commit_message.txt'
+temporary_file <- 'data.csv'

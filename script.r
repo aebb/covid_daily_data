@@ -2,13 +2,22 @@ library(ggplot2)
 library(ggthemes)
 source('config.r')
 
-temporary_file = 'data.csv'
-
+# Files
 download.file(url = url, destfile = temporary_file, method = 'curl')
-
-
-#Evolution graph
 data_set <- tail(read.csv(file = temporary_file )[c('data','confirmados_novos')], last_n_days)
+
+# Prediction
+confirmed <- tail(data_set[c('confirmados_novos')], prediction_interval)
+days <- seq(1, prediction_interval, by = 1)
+prediction_data <- data.frame(days, confirmed)
+fit <- lm(confirmados_novos ~ days, data = prediction_data)
+prediction <- round(predict(fit, data.frame(days = prediction_interval +1 )), 0)
+
+# Message
+today <- tail(data_set['confirmados_novos'], n = 1)
+cat(sprintf("today: %s\ntomorrow: %s", today, prediction), file = commit_message_file)
+
+# Graph
 ggplot(data_set, aes(x = as.Date(factor(data, ordered = T), format = "%d-%m-%Y"), y = confirmados_novos, group = 1)) +
     geom_line(color = line_color) +
     geom_point(color = point_color) +
@@ -30,7 +39,3 @@ ggplot(data_set, aes(x = as.Date(factor(data, ordered = T), format = "%d-%m-%Y")
         panel.grid.minor = element_blank(),
     )
 ggsave(image_file, dpi = 300)
-
-today_number_of_cases <- tail(data_set['confirmados_novos'], n = 1)
-date <- tail(data_set['data'], n = 1)
-cat(sprintf("%s new cases on %s", today_number_of_cases, date), file = commit_message_file)
