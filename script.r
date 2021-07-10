@@ -15,7 +15,7 @@ prediction <- round(predict(fit, data.frame(days = prediction_interval +1 )), 0)
 
 # Message
 today <- tail(data_set['confirmados_novos'], n = 1)
-cat(sprintf("today: %s\ntomorrow: %s", today, prediction), file = commit_message_file)
+cat(sprintf("today: %s | tomorrow: %s", today, prediction), file = commit_message_file)
 
 # Graph
 ggplot(data_set, aes(x = as.Date(factor(data, ordered = T), format = "%d-%m-%Y"), y = confirmados_novos, group = 1)) +
