@@ -38,4 +38,4 @@ ggplot(data_set, aes(x = as.Date(factor(data, ordered = T), format = "%d-%m-%Y")
         plot.title = element_text(hjust = 0.5), 
         panel.grid.minor = element_blank(),
     )
-ggsave(image_file, dpi = 300)
+ggsave(image_file, dpi = 310)
